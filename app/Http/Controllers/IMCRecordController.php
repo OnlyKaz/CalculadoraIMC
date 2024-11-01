@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\IMCRecord; // Importa el modelo
+use Carbon\Carbon; // Importa Carbon para manipulación de fechas
 
 class IMCRecordController extends Controller
 {
     // Método para mostrar el listado de registros IMC
     public function index()
     {
-        $imcRecords = IMCRecord::all();
+        $imcRecords = IMCRecord::all()->map(function ($record) {
+            // Formatea la fecha de examen en el formato deseado
+            $record->fecha_examen = Carbon::parse($record->fecha_examen)->format('d/m/Y H:i:s'); //Fecha en formato 'd/m/Y H:i:s'
+            return $record;
+        });
+
         return view('Registros_imc.index', compact('imcRecords'));
     }
 
@@ -27,7 +33,7 @@ class IMCRecordController extends Controller
             'nombre' => 'required|string|max:255',
             'edad' => 'required|integer',
             'sexo' => 'required|in:Masculino,Femenino,Otro',
-            'numero_identificacion' => 'required|string|unique:registros_imc', // Corrige el nombre de la tabla
+            'numero_identificacion' => 'required|string|unique:registros_imc', // Nombre correcto de la tabla
             'programa_academico' => 'required|string|max:255',
             'peso' => 'required|numeric',
             'altura' => 'required|numeric',
@@ -47,10 +53,9 @@ class IMCRecordController extends Controller
             'peso' => $validated['peso'],
             'altura' => $validated['altura'],
             'imc' => $imc,
-            'fecha_examen' => now(), // Agregar fecha y hora actual
+            'fecha_examen' => Carbon::now(), // Uso explícito de Carbon para claridad
         ]);
 
-        // Redirigir al índice con el mensaje de éxito y el IMC calculado
         return redirect()->route('Registros_imc.index')->with('success', "Registro guardado correctamente. Su IMC es: " . number_format($imc, 2));
     }
 
@@ -68,7 +73,7 @@ class IMCRecordController extends Controller
             'nombre' => 'required|string|max:255',
             'edad' => 'required|integer',
             'sexo' => 'required|in:Masculino,Femenino,Otro',
-            'numero_identificacion' => 'required|string|unique:registros_imc,numero_identificacion,' . $id, // Corrige el nombre de la tabla
+            'numero_identificacion' => 'required|string|unique:registros_imc,numero_identificacion,' . $id, // Nombre correcto de la tabla
             'programa_academico' => 'required|string|max:255',
             'peso' => 'required|numeric',
             'altura' => 'required|numeric',
@@ -90,7 +95,7 @@ class IMCRecordController extends Controller
             'peso' => $validated['peso'],
             'altura' => $validated['altura'],
             'imc' => $imc,
-            'fecha_examen' => now(),
+            'fecha_examen' => Carbon::now(), // Uso explícito de Carbon para claridad
         ]);
 
         return redirect()->route('Registros_imc.index')->with('success', "Registro actualizado correctamente. Su IMC es: " . number_format($imc, 2));
@@ -104,4 +109,6 @@ class IMCRecordController extends Controller
 
         return redirect()->route('Registros_imc.index')->with('success', 'Registro eliminado correctamente');
     }
+
+    
 }

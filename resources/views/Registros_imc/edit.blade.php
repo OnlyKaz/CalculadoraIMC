@@ -1,10 +1,10 @@
-<!-- resources/views/imc_records/create.blade.php -->
-
+<!-- resources/views/Registros_imc/edit.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Nuevo Registro de IMC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Registro IMC</title>
     <style>
         /* Estilos generales */
         body {
@@ -51,6 +51,7 @@
             border-color: #007bff;
             outline: none;
         }
+        /* Estilo de alerta de error */
         .alert-danger {
             color: #dc3545;
             background-color: #f8d7da;
@@ -67,7 +68,7 @@
         .alert-danger li {
             margin: 5px 0;
         }
-        /* Botón de enviar */
+        /* Botón de actualizar */
         button[type="submit"] {
             width: 100%;
             padding: 12px;
@@ -86,63 +87,65 @@
 </head>
 <body>
 
-    <h1>Registrar Nuevo IMC</h1>
+    <h1>Editar Registro IMC</h1>
 
     <div class="form-container">
-        <!-- Muestra los errores de validación si existen -->
-        @if ($errors->any())
-            <div class="alert alert-danger">
+        <!-- Muestra errores de validación si existen -->
+        @if($errors->any())
+            <div class="alert-danger">
                 <ul>
-                    @foreach ($errors->all() as $error)
+                    @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
         @endif
 
-        <form action="{{ route('Registros_imc.store') }}" method="POST">
+        <!-- Formulario de edición -->
+        <form action="{{ route('Registros_imc.update', $record->id) }}" method="POST">
             @csrf
+            @method('PUT')
 
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
-                <input type="text" id="nombre" name="nombre" value="{{ old('nombre') }}" required>
+                <input type="text" id="nombre" name="nombre" value="{{ old('nombre', $record->nombre) }}" required>
             </div>
 
             <div class="form-group">
                 <label for="edad">Edad:</label>
-                <input type="number" id="edad" name="edad" value="{{ old('edad') }}" required>
+                <input type="number" id="edad" name="edad" value="{{ old('edad', $record->edad) }}" required>
             </div>
 
             <div class="form-group">
                 <label for="sexo">Sexo:</label>
                 <select id="sexo" name="sexo" required>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
-                    <option value="Otro">Otro</option>
+                    <option value="Masculino" {{ old('sexo', $record->sexo) == 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                    <option value="Femenino" {{ old('sexo', $record->sexo) == 'Femenino' ? 'selected' : '' }}>Femenino</option>
+                    <option value="Otro" {{ old('sexo', $record->sexo) == 'Otro' ? 'selected' : '' }}>Otro</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="numero_identificacion">Número de Identificación:</label>
-                <input type="text" id="numero_identificacion" name="numero_identificacion" value="{{ old('numero_identificacion') }}" required>
+                <input type="text" id="numero_identificacion" name="numero_identificacion" value="{{ old('numero_identificacion', $record->numero_identificacion) }}" required>
             </div>
 
             <div class="form-group">
                 <label for="programa_academico">Programa Académico:</label>
-                <input type="text" id="programa_academico" name="programa_academico" value="{{ old('programa_academico') }}" required>
+                <input type="text" id="programa_academico" name="programa_academico" value="{{ old('programa_academico', $record->programa_academico) }}" required>
             </div>
 
             <div class="form-group">
                 <label for="peso">Peso (kg):</label>
-                <input type="number" id="peso" name="peso" step="0.01" value="{{ old('peso') }}" required>
+                <input type="number" id="peso" name="peso" step="0.1" value="{{ old('peso', $record->peso) }}" required>
             </div>
 
             <div class="form-group">
                 <label for="altura">Altura (cm):</label>
-                <input type="number" id="altura" name="altura" step="0.01" value="{{ old('altura') }}" required>
+                <input type="number" id="altura" name="altura" step="0.1" value="{{ old('altura', $record->altura) }}" required>
             </div>
 
-            <button type="submit">Guardar Registro</button>
+            <button type="submit">Actualizar</button>
         </form>
     </div>
 

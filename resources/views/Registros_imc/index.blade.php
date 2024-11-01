@@ -73,56 +73,57 @@
 </head>
 <body>
 
-    <h1>Listado de Registros IMC</h1>
+<h1>Listado de Registros IMC</h1>
 
-    @if(session('success'))
-        <p class="success-message">{{ session('success') }}</p>
-    @endif
+@if(session('success'))
+    <p class="success-message">{{ session('success') }}</p>
+@endif
 
-    <a href="{{ route('Registros_imc.create') }}" class="add-button">Agregar Nuevo Registro</a>
+<a href="{{ route('Registros_imc.create') }}" class="add-button">Agregar Nuevo Registro</a>
 
-    <table>
-        <thead>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Edad</th>
+            <th>Sexo</th>
+            <th>Número de Identificación</th>
+            <th>Programa Académico</th>
+            <th>Peso (kg)</th>
+            <th>Altura (cm)</th>
+            <th>IMC</th>
+            <th>Fecha del Examen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($imcRecords as $record)
             <tr>
-                <th>Nombre</th>
-                <th>Edad</th>
-                <th>Sexo</th>
-                <th>Número de Identificación</th>
-                <th>Programa Académico</th>
-                <th>Peso (kg)</th>
-                <th>Altura (cm)</th>
-                <th>IMC</th>
-                <th>Fecha del Examen</th>
-                <th>Acciones</th>
+                <td>{{ $record->nombre }}</td>
+                <td>{{ $record->edad }}</td>
+                <td>{{ $record->sexo }}</td>
+                <td>{{ $record->numero_identificacion }}</td>
+                <td>{{ $record->programa_academico }}</td>
+                <td>{{ number_format($record->peso, 1) }} kg</td>
+                <td>{{ number_format($record->altura, 1) }} cm</td>
+                <td>{{ number_format($record->imc, 2) }}</td>
+                <!-- Formato de hora explicita -->
+                <td>{{ \Carbon\Carbon::parse($record->fecha_examen)->format('d/m/Y H:i:s') }}</td>
+                <td class="action-buttons">
+                    <a href="{{ route('Registros_imc.edit', $record->id) }}" class="edit-button">Editar</a>
+                    <form action="{{ route('Registros_imc.destroy', $record->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="delete-button" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro?')">Borrar</button>
+                    </form>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @forelse($imcRecords as $record)
-                <tr>
-                    <td>{{ $record->nombre }}</td>
-                    <td>{{ $record->edad }}</td>
-                    <td>{{ $record->sexo }}</td>
-                    <td>{{ $record->numero_identificacion }}</td>
-                    <td>{{ $record->programa_academico }}</td>
-                    <td>{{ number_format($record->peso, 1) }} kg</td>
-                    <td>{{ number_format($record->altura, 1) }} cm</td>
-                    <td>{{ number_format($record->imc, 2) }}</td>
-                    <td>{{ $record->fecha_examen }}</td>
-                    <td class="action-buttons">
-                        <a href="{{ route('Registros_imc.edit', $record->id) }}" class="edit-button">Editar</a>
-                        <form action="{{ route('Registros_imc.destroy', $record->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="delete-button" onclick="return confirm('¿Estás seguro de que deseas eliminar este registro?')">Borrar</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="10">No hay registros disponibles.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        @empty
+            <tr>
+                <td colspan="10">No hay registros disponibles.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
 </body>
 </html>
