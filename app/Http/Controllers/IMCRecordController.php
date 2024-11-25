@@ -31,9 +31,9 @@ class IMCRecordController extends Controller
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
-            'edad' => 'required|integer',
+            'edad' => 'required|integer|min:0', // Validación: edad no puede ser menor que 0
             'sexo' => 'required|in:Masculino,Femenino,Otro',
-            'numero_identificacion' => 'required|string|unique:registros_imc', // Nombre correcto de la tabla
+            'numero_identificacion' => 'required|string|unique:registros_imc|min:0', // Validación: número de identificación no puede ser menor que 0
             'programa_academico' => 'required|string|max:255',
             'peso' => 'required|numeric',
             'altura' => 'required|numeric',
@@ -42,6 +42,9 @@ class IMCRecordController extends Controller
         // Convertir la altura de cm a metros para el cálculo de IMC
         $alturaMetros = $validated['altura'] / 100;
         $imc = $validated['peso'] / ($alturaMetros ** 2);
+
+        // Calcular la recomendación
+        $recomendacion = $this->calcularRecomendacion($imc);
 
         // Crear y guardar el nuevo registro
         $imcRecord = IMCRecord::create([
@@ -53,27 +56,26 @@ class IMCRecordController extends Controller
             'peso' => $validated['peso'],
             'altura' => $validated['altura'],
             'imc' => $imc,
-            'fecha_examen' => Carbon::now(), // Uso explícito de Carbon para claridad
+            'recomendacion' => $recomendacion, 
+            'fecha_examen' => Carbon::now(),
         ]);
 
         return redirect()->route('Registros_imc.index')->with('success', "Registro guardado correctamente. Su IMC es: " . number_format($imc, 2));
     }
 
-    // Método para mostrar el formulario de edición de un registro específico
     public function edit($id)
     {
         $record = IMCRecord::findOrFail($id);
         return view('Registros_imc.edit', compact('record'));
     }
 
-    // Método para actualizar un registro en la base de datos
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
-            'edad' => 'required|integer',
+            'edad' => 'required|integer|min:0', 
             'sexo' => 'required|in:Masculino,Femenino,Otro',
-            'numero_identificacion' => 'required|string|unique:registros_imc,numero_identificacion,' . $id, // Nombre correcto de la tabla
+            'numero_identificacion' => 'required|string|unique:registros_imc,numero_identificacion,' . $id . '|min:0', 
             'programa_academico' => 'required|string|max:255',
             'peso' => 'required|numeric',
             'altura' => 'required|numeric',
@@ -85,6 +87,9 @@ class IMCRecordController extends Controller
         $alturaMetros = $validated['altura'] / 100;
         $imc = $validated['peso'] / ($alturaMetros ** 2);
 
+        // Calcular la recomendación
+        $recomendacion = $this->calcularRecomendacion($imc);
+
         // Actualizar el registro
         $record->update([
             'nombre' => $validated['nombre'],
@@ -95,7 +100,8 @@ class IMCRecordController extends Controller
             'peso' => $validated['peso'],
             'altura' => $validated['altura'],
             'imc' => $imc,
-            'fecha_examen' => Carbon::now(), // Uso explícito de Carbon para claridad
+            'recomendacion' => $recomendacion, 
+            'fecha_examen' => Carbon::now(), 
         ]);
 
         return redirect()->route('Registros_imc.index')->with('success', "Registro actualizado correctamente. Su IMC es: " . number_format($imc, 2));
@@ -110,5 +116,17 @@ class IMCRecordController extends Controller
         return redirect()->route('Registros_imc.index')->with('success', 'Registro eliminado correctamente');
     }
 
-    
+    // Método privado para calcular la recomendación
+    private function calcularRecomendacion($imc)
+    {
+        if ($imc < 18.5) {
+            return "Su IMC es de " . number_format($imc, 2) . ". Está dentro del rango de peso insuficiente. Es recomendable aumentar la ingesta calórica y consultar a un especialista.";
+        } elseif ($imc >= 18.5 && $imc < 24.9) {
+            return "Su IMC es de " . number_format($imc, 2) . ". Está dentro del rango de peso normal o saludable. Mantenga una dieta balanceada y ejercicio regular.";
+        } elseif ($imc >= 25 && $imc < 29.9) {
+            return "Su IMC es de " . number_format($imc, 2) . ". Está dentro del rango de sobrepeso. Es recomendable cuidar la alimentación y aumentar la actividad física.";
+        } else {
+            return "Su IMC es de " . number_format($imc, 2) . ". Está dentro del rango de obesidad. Consulte a un especialista para un plan de alimentación y ejercicio personalizado.";
+        }
+    }
 }

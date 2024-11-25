@@ -1,4 +1,3 @@
-<!-- resources/views/Registros_imc/index.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -70,6 +69,12 @@
         .delete-button:hover {
             background-color: #c82333;
         }
+        
+        td.recomendacion {
+            word-wrap: break-word;
+            white-space: normal;
+            max-width: 200px; 
+        }
     </style>
 </head>
 <body>
@@ -94,6 +99,7 @@
             <th>Altura (cm)</th>
             <th>IMC</th>
             <th>Fecha del Examen</th>
+            <th>Recomendaciones</th> 
             <th>Acciones</th>
         </tr>
     </thead>
@@ -108,8 +114,8 @@
                 <td>{{ number_format($record->peso, 1) }} kg</td>
                 <td>{{ number_format($record->altura, 1) }} cm</td>
                 <td>{{ number_format($record->imc, 2) }}</td>
-                <!-- Formato de hora explicita -->
                 <td>{{ \Carbon\Carbon::parse($record->fecha_examen)->format('d/m/Y H:i:s') }}</td>
+                <td class="recomendacion">{{ $record->recomendacion }}</td>
                 <td class="action-buttons">
                     <a href="{{ route('Registros_imc.edit', $record->id) }}" class="edit-button">Editar</a>
                     <form action="{{ route('Registros_imc.destroy', $record->id) }}" method="POST" style="display:inline;">
@@ -121,7 +127,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="10">No hay registros disponibles.</td>
+                <td colspan="11">No hay registros disponibles.</td>
             </tr>
         @endforelse
     </tbody>

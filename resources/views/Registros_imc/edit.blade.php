@@ -90,7 +90,7 @@
     <h1>Editar Registro IMC</h1>
 
     <div class="form-container">
-        <!-- Muestra errores de validación si existen -->
+    
         @if($errors->any())
             <div class="alert-danger">
                 <ul>

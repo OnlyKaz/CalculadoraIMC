@@ -8,7 +8,7 @@ class CreateImcRecordsTable extends Migration
 {
     public function up()
     {
-        Schema::create('Registros_imc', function (Blueprint $table) { // Cambia el nombre aquí
+        Schema::create('Registros_imc', function (Blueprint $table) { 
             $table->id();
             $table->string('nombre');
             $table->integer('edad');
@@ -24,6 +24,6 @@ class CreateImcRecordsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('Registros_imc'); // Cambia el nombre aquí también
+        Schema::dropIfExists('Registros_imc'); 
     }
 }

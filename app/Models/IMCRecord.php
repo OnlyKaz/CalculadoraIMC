@@ -22,22 +22,19 @@ class IMCRecord extends Model
         'altura', 
         'imc', 
         'fecha_examen',
+        'recomendacion', 
     ];
 
-    // Mutator para convertir la fecha al formato adecuado
     public function setFechaExamenAttribute($value)
     {
-        // Verificar si la fecha es válida y no vacía
         if (!empty($value)) {
             try {
-                // Intentar convertir la fecha con el formato adecuado
                 $this->attributes['fecha_examen'] = Carbon::createFromFormat('d/m/Y H:i:s', $value)->toDateTimeString();
             } catch (\Exception $e) {
-                // Si la fecha no es válida, manejar el error (puedes loguearlo si es necesario)
-                $this->attributes['fecha_examen'] = null; // O algún valor predeterminado si lo prefieres
+                $this->attributes['fecha_examen'] = null;
             }
         } else {
-            $this->attributes['fecha_examen'] = null; // Si la fecha está vacía, asignar nulo
+            $this->attributes['fecha_examen'] = null;
         }
     }
 
